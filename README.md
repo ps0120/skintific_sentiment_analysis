@@ -1,1 +1,0 @@
-# skintific_sentiment_analysis
