@@ -1,8 +1,3 @@
-"""
-Page 2: Dashboard
-Summarizes the combined Shopee Malaysia skincare review dataset (cushion + moisturizer)
-and surfaces auto-generated, data-driven business insights.
-"""
 
 import streamlit as st
 import pandas as pd
@@ -24,7 +19,7 @@ def render(df: pd.DataFrame):
 
     stats = compute_insights(df)
 
-    # --- KPI row -----------------------------------------------------------
+#Dataset reviews
     k1, k2, k3, k4, k5 = st.columns(5)
     k1.metric("Total Reviews", f"{stats['total']:,}")
     k2.metric("% Positive", f"{stats['sentiment_pct'].get('positive', 0):.1f}%")
@@ -35,7 +30,7 @@ def render(df: pd.DataFrame):
 
     st.divider()
 
-    # --- Sentiment distribution: overall + by product ----------------------
+    # Sentiment distribution: overall + by product
     c1, c2 = st.columns([1, 1.4])
 
     with c1:
@@ -73,7 +68,7 @@ def render(df: pd.DataFrame):
 
     st.divider()
 
-    # --- Per-product KPI comparison -----------------------------------------
+
     st.subheader("Product Comparison")
     prod_cols = st.columns(len(stats["per_product"]))
     for col, (product, info) in zip(prod_cols, stats["per_product"].items()):
@@ -87,7 +82,7 @@ def render(df: pd.DataFrame):
 
     st.divider()
 
-    # --- Keyword themes ------------------------------------------------------
+
     st.subheader("What Customers Talk About")
     kw1, kw2 = st.columns(2)
 
@@ -117,15 +112,15 @@ def render(df: pd.DataFrame):
 
     st.divider()
 
-    # --- Auto-generated business insights ------------------------------------
+
     st.subheader("💼 Business Insights")
-    st.caption("Automatically generated from the current dataset — recalculated live, not hardcoded.")
+    st.caption("Automatically generated from the current dataset.")
     for insight in stats["insights"]:
         st.info(insight, icon="💡")
 
     st.divider()
 
-    # --- Raw data explorer ----------------------------------------------------
+    
     with st.expander("🔍 Explore raw reviews"):
         f1, f2 = st.columns(2)
         product_filter = f1.multiselect(

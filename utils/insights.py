@@ -1,16 +1,8 @@
-"""
-Computes word-frequency themes and auto-generated business insight text directly
-from the dataset — nothing here is hardcoded; every number/keyword is recalculated
-from whatever data is currently loaded, so insights stay correct if the dataset changes.
-"""
 
 from collections import Counter
 import pandas as pd
 
 # Words that are frequent but carry no business meaning for a skincare seller
-# (separate from the stopword removal already done in processed_text — these are
-# domain-specific filler words that survived lemmatization, e.g. "try", "good" alone
-# isn't filtered here on purpose since "good"/"bad" ARE meaningful sentiment signals).
 GENERIC_FILLER = {
     "try", "well", "make", "like", "look", "take", "thing", "get",
     "really", "also", "quite", "little", "use", "buy", "order",
@@ -19,7 +11,7 @@ GENERIC_FILLER = {
 
 
 def top_keywords(texts: pd.Series, top_n: int = 12, exclude: set | None = None) -> list[tuple[str, int]]:
-    """Word-frequency count over a series of already-lemmatized, stopword-removed text."""
+    #Word-frequency count over a series of already-lemmatized, stopword-removed text."""
     exclude = exclude or set()
     words = " ".join(texts.dropna().astype(str)).split()
     words = [w for w in words if w not in exclude]
@@ -27,10 +19,7 @@ def top_keywords(texts: pd.Series, top_n: int = 12, exclude: set | None = None) 
 
 
 def compute_insights(df: pd.DataFrame) -> dict:
-    """
-    Returns a dict of computed stats + auto-generated insight strings, used by the
-    dashboard page. All figures are derived live from `df`.
-    """
+
     total = len(df)
     sentiment_counts = df["sentiment"].value_counts()
     sentiment_pct = (sentiment_counts / total * 100).round(1)
@@ -66,9 +55,7 @@ def compute_insights(df: pd.DataFrame) -> dict:
         top_n=12, exclude=GENERIC_FILLER,
     )
 
-    # Service vs product-quality split among negative/neutral reviews — a useful,
-    # genuinely data-driven business distinction: is dissatisfaction about the
-    # PRODUCT itself, or about FULFILLMENT/SERVICE (refund, missing item, wrong shade)?
+
     service_terms = {"service", "customer", "refund", "refill", "missing", "box",
                       "sticker", "wrong", "shade", "delivery", "courier", "seller"}
     neg_neu = df[df["sentiment"].isin(["negative", "neutral"])]
@@ -89,8 +76,7 @@ def compute_insights(df: pd.DataFrame) -> dict:
         f"{sentiment_pct.get('positive', 0):.1f}% are positive, "
         f"{sentiment_pct.get('neutral', 0):.1f}% neutral, and "
         f"{sentiment_pct.get('negative', 0):.1f}% negative — overall customer "
-        f"sentiment is strongly positive, but the small negative segment is "
-        f"concentrated in specific, addressable themes (see below)."
+
     )
 
     if len(products) >= 2:
@@ -105,23 +91,22 @@ def compute_insights(df: pd.DataFrame) -> dict:
             )
 
     if overall_top_positive:
-        kw_str = ", ".join(w for w, _ in overall_top_positive[:5])
+        kw_str = ", ".join(w for w, _ in overall_top_positive[:4])
         insights.append(
             f"The most common themes in positive reviews are: {kw_str}. "
-            f"These are the selling points worth highlighting in product listings and ads."
+            f"These are the selling points which can be highlighting in product listings and ads."
         )
 
     if pct_service_related > 0:
         insights.append(
-            f"Among negative/neutral reviews, about {pct_service_related:.1f}% mention "
-            f"fulfillment or customer-service issues (refunds, wrong shade, missing items, "
-            f"packaging) rather than the product formula itself — this suggests operational "
-            f"fixes (order accuracy, packaging QC) could resolve a meaningful share of complaints "
-            f"without touching the product formulation."
+            f"Among negative/neutral reviews, {pct_service_related:.1f}% reviews mention customer-service issues (refunds, wrong shade, missing items packaging)"
+            f" rather than the product itself. "
+            f"Company need to fix these issues (order accuracy, packaging) to reduce some complaints "
+            f"without changing the product."
         )
 
     if overall_top_negative:
-        kw_str = ", ".join(w for w, _ in overall_top_negative[:5])
+        kw_str = ", ".join(w for w, _ in overall_top_negative[:4])
         insights.append(
             f"The most common themes in negative/neutral reviews are: {kw_str}. "
             f"These are the first areas to investigate for product or service improvement."

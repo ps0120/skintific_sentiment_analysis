@@ -1,10 +1,6 @@
-"""
-Page 1: Predict Sentiment
-Lets a user type/paste a new review and see the DistilBERT model's sentiment prediction.
-"""
-
 import streamlit as st
 import plotly.graph_objects as go
+from langdetect import detect, LangDetectException
 
 from utils.model_loader import predict_sentiment
 
@@ -22,14 +18,13 @@ def render(model, tokenizer, model_load_error, model_dir):
     st.header("🔮 Predict Review Sentiment")
     st.caption(
         "Enter a new skincare product review below. The fine-tuned DistilBERT model "
-        "will classify it as **positive**, **neutral**, or **negative**."
+        "will classify it either is **positive**, **neutral**, or **negative**."
     )
 
     if model_load_error:
         st.warning(model_load_error, icon="⚠️")
         st.info(
             "You can still explore the **Dashboard** page while the model is unavailable.",
-            icon="ℹ️",
         )
         return
 
@@ -51,7 +46,16 @@ def render(model, tokenizer, model_load_error, model_dir):
     if predict_clicked:
         if not review_text or not review_text.strip():
             st.error("Please enter a review first.")
-            return
+            st.stop()
+
+        try:
+            lang = detect(review_text)
+            if lang != "en":
+                st.error("Please enter your review in English only. Other languages are not supported.")
+                st.stop()
+        except LangDetectException:
+            st.error(" Could not detect the language. Please enter your review in English.")
+            st.stop()
 
         with st.spinner("Running inference..."):
             label, probs = predict_sentiment(review_text, model, tokenizer)

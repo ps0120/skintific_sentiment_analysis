@@ -1,6 +1,4 @@
-"""
-Loads the combined, cleaned Shopee skincare review dataset for the dashboard.
-"""
+
 
 import os
 import streamlit as st
