@@ -9,7 +9,7 @@ SENTIMENT_EMOJI = {"positive": "😊", "neutral": "😐", "negative": "😞"}
 
 SAMPLE_REVIEWS = [
     "this product is amazing, my skin feels so smooth and hydrated after just one week!",
-    "make skin get acne and oil",
+    "my skin same as previous.",
     "terrible, the cushion broke me out badly and the customer service never replied to my refund request",
 ]
 
@@ -48,9 +48,16 @@ def render(model, tokenizer, model_load_error, model_dir):
             st.error("Please enter a review first.")
             st.stop()
 
+        if review_text.strip().isdigit():
+            st.error(" Please enter a valid review. Numbers only are not accepted.")
+            st.stop()
+
         try:
             lang = detect(review_text)
-
+            allowed_langs = ["en", "so", "tl", "af"]
+            if lang not in allowed_langs:
+                st.error("Please enter your review in English only. Other languages are not supported.")
+                st.stop()
         except LangDetectException:
             st.error(" Could not detect the language. Please enter your review in English.")
             st.stop()
