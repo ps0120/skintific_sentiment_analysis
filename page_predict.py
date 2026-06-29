@@ -9,7 +9,7 @@ SENTIMENT_EMOJI = {"positive": "😊", "neutral": "😐", "negative": "😞"}
 
 SAMPLE_REVIEWS = [
     "this product is amazing, my skin feels so smooth and hydrated after just one week!",
-    "my skin same as previous.",
+    "my skin is same like previous.",
     "terrible, the cushion broke me out badly and the customer service never replied to my refund request",
 ]
 
