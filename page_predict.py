@@ -50,9 +50,7 @@ def render(model, tokenizer, model_load_error, model_dir):
 
         try:
             lang = detect(review_text)
-            if lang != "en":
-                st.error("Please enter your review in English only. Other languages are not supported.")
-                st.stop()
+
         except LangDetectException:
             st.error(" Could not detect the language. Please enter your review in English.")
             st.stop()
